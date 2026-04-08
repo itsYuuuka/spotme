@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getTemplates, createTemplate, deleteTemplate } from "../api";
 import type { Template } from "../types";
 
@@ -9,6 +9,7 @@ export default function TemplatesPage() {
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("");
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchTemplates();
@@ -33,10 +34,7 @@ export default function TemplatesPage() {
         day_of_week: dayOfWeek,
         order_index: templates.length,
       });
-      setTemplates((prev) => [...prev, res.data]);
-      setName("");
-      setDayOfWeek("");
-      setShowForm(false);
+      navigate(`/templates/${res.data.id}`);
     } catch {
       console.error("Failed to create template");
     }
