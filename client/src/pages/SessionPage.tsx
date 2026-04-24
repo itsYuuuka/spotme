@@ -221,6 +221,14 @@ export default function SessionPage() {
           </div>
         )}
       </div>
+      <div className="mt-8 pb-6">
+        <Link
+          to="/dashboard"
+          className="block w-full py-3 bg-green-600 hover:bg-green-700 rounded font-bold text-center cursor-pointer"
+        >
+          Finish Workout ✓
+        </Link>
+      </div>
     </div>
   );
 }
