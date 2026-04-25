@@ -125,7 +125,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              {feed.map((item) => (
+              {feed.slice(0, 5).map((item) => (
                 <div
                   key={item.session_id}
                   className="bg-gray-800 rounded-lg p-4"
