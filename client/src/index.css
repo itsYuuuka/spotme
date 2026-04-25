@@ -3,6 +3,7 @@
 html,
 body {
   overflow-x: hidden;
+  background-color: #111827;
 }
 
 @keyframes slide-in {
