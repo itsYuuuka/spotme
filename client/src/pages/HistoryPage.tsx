@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getSessions, deleteSession } from "../api";
 import type { Session } from "../types";
+import { formatDate } from "../utils";
 
 export default function HistoryPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -50,7 +51,7 @@ export default function HistoryPage() {
                 className="bg-gray-800 rounded-lg p-4 flex items-center justify-between"
               >
                 <div>
-                  <p className="font-bold">{session.date}</p>
+                  <p className="font-bold">{formatDate(session.date)}</p>
                   {session.notes && (
                     <p className="text-sm text-gray-400">{session.notes}</p>
                   )}

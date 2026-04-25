@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getSession, getTemplate, addSet, deleteSet } from "../api";
 import type { Session, SessionSet, Exercise } from "../types";
+import { formatDate } from "../utils";
 
 export default function SessionPage() {
   const { id } = useParams<{ id: string }>();
@@ -121,7 +122,7 @@ export default function SessionPage() {
           </Link>
           <div>
             <h1 className="text-xl font-bold">Today's Workout</h1>
-            <p className="text-sm text-gray-400">{session.date}</p>
+            <p className="text-sm text-gray-400">{formatDate(session.date)}</p>
           </div>
         </div>
 

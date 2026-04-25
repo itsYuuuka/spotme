@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getTemplates, getFeed, createSession } from "../api";
 import type { Template, FeedItem } from "../types";
+import { formatDate } from "../utils";
 
 export default function DashboardPage() {
   const { name } = useAuth();
@@ -120,7 +121,9 @@ export default function DashboardPage() {
                 >
                   <div className="flex items-center justify-between">
                     <p className="font-bold">{item.user_name}</p>
-                    <p className="text-sm text-gray-400">{item.date}</p>
+                    <p className="text-sm text-gray-400">
+                      {formatDate(item.date)}
+                    </p>
                   </div>
                   <p className="text-sm text-gray-400 mt-1">
                     {item.template_name} - {item.set_count} sets

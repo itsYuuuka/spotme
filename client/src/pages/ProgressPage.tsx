@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAllProgress, getExerciseProgress } from "../api";
 import type { ExerciseProgress } from "../types";
+import { formatDate } from "../utils";
 
 export default function ProgressPage() {
   const [exercises, setExercises] = useState<ExerciseProgress[]>([]);
@@ -87,7 +88,7 @@ export default function ProgressPage() {
                           className="flex items-center justify-between bg-gray-700 rounded-lg px-4 py-3"
                         >
                           <span className="text-sm text-gray-400">
-                            {dp.date}
+                            {formatDate(dp.date)}
                           </span>
                           <div className="flex gap-6 text-sm">
                             <span className="font-bold text-orange-400">
