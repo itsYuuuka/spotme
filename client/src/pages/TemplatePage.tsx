@@ -1,7 +1,78 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getTemplate, addExercise, deleteExercise } from "../api";
-import type { Template } from "../types";
+import type { Exercise, Template } from "../types";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+function SortableExercise({
+  exercise,
+  index,
+  onDelete,
+}: {
+  exercise: Exercise;
+  index: number;
+  onDelete: (id: string) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: exercise.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-gray-800 rounded-lg p-4 flex items-center justify-between"
+    >
+      <div className="flex items-center gap-3">
+        <button
+          {...attributes}
+          {...listeners}
+          className="text-gray-500 hover:text-gray-300 cursor-grab active:cursor-grabbing touch-none"
+        >
+          ⠿
+        </button>
+        <div>
+          <p className="font-bold">
+            {index + 1}. {exercise.name}
+          </p>
+          <p className="text-sm text-gray-400">
+            {exercise.target_sets} sets ×{" "}
+            {exercise.is_timed
+              ? `${exercise.target_reps}s`
+              : `${exercise.target_reps} reps`}
+            {exercise.notes && ` — ${exercise.notes}`}
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={() => onDelete(exercise.id)}
+        className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm cursor-pointer"
+      >
+        Remove
+      </button>
+    </div>
+  );
+}
 
 export default function TemplatePage() {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +85,31 @@ export default function TemplatePage() {
   const [targetReps, setTargetReps] = useState(8);
   const [notes, setNotes] = useState("");
   const [isTimed, setIsTimed] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !template) return;
+
+    const exercises = template.exercises ?? [];
+    const oldIndex = exercises.findIndex((e) => e.id === active.id);
+    const newIndex = exercises.findIndex((e) => e.id === over.id);
+
+    setTemplate((prev) =>
+      prev
+        ? {
+            ...prev,
+            exercises: arrayMove(prev.exercises ?? [], oldIndex, newIndex),
+          }
+        : prev,
+    );
+  };
 
   useEffect(() => {
     fetchTemplate();
@@ -180,33 +276,27 @@ export default function TemplatePage() {
         {!template.exercises || template.exercises.length === 0 ? (
           <p className="text-gray-400">No exercises yet. Add your first one!</p>
         ) : (
-          <div className="flex flex-col gap-3">
-            {template.exercises.map((exercise, index) => (
-              <div
-                key={exercise.id}
-                className="bg-gray-800 rounded-lg p-4 flex items-center justify-between"
-              >
-                <div>
-                  <p className="font-bold">
-                    {index + 1}. {exercise.name}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    {exercise.target_sets} sets ×{" "}
-                    {exercise.is_timed
-                      ? `${exercise.target_reps}s`
-                      : `${exercise.target_reps} reps`}
-                    {exercise.notes && ` — ${exercise.notes}`}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleDeleteExercise(exercise.id)}
-                  className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm cursor-pointer"
-                >
-                  Remove
-                </button>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={template.exercises.map((e) => e.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="flex flex-col gap-3">
+                {template.exercises.map((exercise, index) => (
+                  <SortableExercise
+                    key={exercise.id}
+                    exercise={exercise}
+                    index={index}
+                    onDelete={handleDeleteExercise}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
     </div>
