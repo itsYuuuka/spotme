@@ -97,8 +97,8 @@ func (s *Service) GetFeed(ctx context.Context, userID string) ([]FeedItem, error
 			FROM friendships
 			WHERE (user_id = $1 OR friend_id = $1) AND status = 'accepted'
 		)
-		GROUP BY s.id, u.name, wt.name, s.date
-		ORDER BY s.date DESC
+		GROUP BY s.id, u.name, wt.name, s.date, s.created_at
+		ORDER BY s.created_at DESC
 		LIMIT 20
 	`, userID)
 	if err != nil {
