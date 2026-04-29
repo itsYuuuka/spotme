@@ -5,6 +5,7 @@ import {
   addExercise,
   deleteExercise,
   updateExercise,
+  updateTemplate,
 } from "../api";
 import type { Exercise, Template } from "../types";
 import {
@@ -24,6 +25,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Pencil } from "lucide-react";
 
 function SortableExercise({
   exercise,
@@ -91,12 +93,30 @@ export default function TemplatePage() {
   const [notes, setNotes] = useState("");
   const [isTimed, setIsTimed] = useState(false);
 
+  const [editingName, setEditingName] = useState(false);
+  const [newTemplateName, setNewTemplateName] = useState("");
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  const handleUpdateName = async () => {
+    if (!id) return;
+    try {
+      await updateTemplate(id, {
+        name: newTemplateName,
+        day_of_week: template?.day_of_week ?? "",
+        order_index: template?.order_index ?? 0,
+      });
+      setTemplate((prev) => (prev ? { ...prev, name: newTemplateName } : prev));
+      setEditingName(false);
+    } catch {
+      console.error("Failed to update template name");
+    }
+  };
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
@@ -206,8 +226,37 @@ export default function TemplatePage() {
           <Link to="/templates" className="text-gray-400 hover:text-white">
             ← Back
           </Link>
-          <h1 className="text-2xl font-bold">{template.name}</h1>
-          {template.day_of_week && (
+          <div className="h-9 flex items-center">
+            {editingName ? (
+              <input
+                type="text"
+                value={newTemplateName}
+                onChange={(e) => setNewTemplateName(e.target.value)}
+                onBlur={handleUpdateName}
+                className="bg-transparent text-white font-bold text-2xl outline-none w-48 leading-none p-0"
+                autoFocus
+                maxLength={20}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleUpdateName();
+                }}
+              />
+            ) : (
+              <button
+                onClick={() => {
+                  setNewTemplateName(template.name);
+                  setEditingName(true);
+                }}
+                className="flex items-center gap-2 hover:text-orange-400 cursor-pointer group"
+              >
+                <h1 className="text-2xl font-bold">{template.name}</h1>
+                <Pencil
+                  size={16}
+                  className="text-gray-500 group-hover:text-orange-400"
+                />
+              </button>
+            )}
+          </div>
+          {!editingName && template.day_of_week && (
             <span className="text-sm text-gray-400">
               {template.day_of_week}
             </span>
