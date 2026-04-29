@@ -12,7 +12,7 @@ export default function SessionPage() {
 
   // Per exercise input state
   const [inputs, setInputs] = useState<
-    Record<string, { reps: number; weight: number }>
+    Record<string, { reps: string; weight: string }>
   >({});
 
   useEffect(() => {
@@ -41,14 +41,14 @@ export default function SessionPage() {
 
   const handleLogSet = async (exerciseId: string) => {
     if (!id || !session) return;
-    const input = inputs[exerciseId] ?? { reps: 8, weight: 0 };
+    const input = inputs[exerciseId] ?? { reps: "8", weight: "0" };
     const existingSets = getExerciseSets(exerciseId);
     try {
       const res = await addSet(id, {
         exercise_id: exerciseId,
         set_number: existingSets.length + 1,
-        reps: input.reps,
-        weight: input.weight,
+        reps: parseInt(input.reps.replace(",", ".")) || 0,
+        weight: parseFloat(input.weight.replace(",", ".")) || 0,
         duration_seconds: 0,
       });
       setSession((prev) =>
@@ -76,12 +76,12 @@ export default function SessionPage() {
   const updateInput = (
     exerciseId: string,
     field: "reps" | "weight",
-    value: number,
+    value: string,
   ) => {
     setInputs((prev) => ({
       ...prev,
       [exerciseId]: {
-        ...(prev[exerciseId] ?? { reps: 8, weight: 0 }),
+        ...(prev[exerciseId] ?? { reps: "8", weight: "0" }),
         [field]: value,
       },
     }));
@@ -172,15 +172,13 @@ export default function SessionPage() {
                       Weight (kg)
                     </label>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
                       value={input.weight}
                       onChange={(e) =>
-                        updateInput(
-                          exercise.id,
-                          "weight",
-                          Number(e.target.value),
-                        )
+                        updateInput(exercise.id, "weight", e.target.value)
                       }
+                      onFocus={(e) => e.target.select()}
                       className="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white text-center text-lg font-bold"
                       min={0}
                       step={0.5}
@@ -191,11 +189,13 @@ export default function SessionPage() {
                       Reps
                     </label>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={input.reps}
                       onChange={(e) =>
-                        updateInput(exercise.id, "reps", Number(e.target.value))
+                        updateInput(exercise.id, "reps", e.target.value)
                       }
+                      onFocus={(e) => e.target.select()}
                       className="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white text-center text-lg font-bold"
                       min={1}
                     />
