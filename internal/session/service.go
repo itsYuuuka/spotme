@@ -22,7 +22,7 @@ func (s *Service) GetSessions(ctx context.Context, userID string) ([]Session, er
 		SELECT id, user_id, template_id, date::text, notes
 		FROM sessions
 		WHERE user_id = $1
-		ORDER BY date DESC
+		ORDER BY created_at DESC
 	`, userID)
 	if err != nil {
 		return nil, err
