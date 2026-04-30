@@ -26,10 +26,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-      <div className="w-full max-w-md p-8 bg-gray-800 rounded-lg">
-        <h1 className="text-3xl font-bold text-orange-400 mb-2">SpotMe</h1>
-        <h2 className="text-xl mb-6">Create Account</h2>
+    <div className="fixed inset-0 bg-gray-900 text-white flex items-center justify-center p-4">
+      <div className="w-full max-w-sm p-6 bg-gray-800 rounded-lg">
+        <h1 className="text-2xl font-bold text-orange-400 mb-1">SpotMe</h1>
+        <h2 className="text-lg mb-4">Create Account</h2>
         {error && <p className="text-red-400 mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
