@@ -16,7 +16,7 @@ type FriendRequest struct {
 type FeedItem struct {
 	SessionID    string `json:"session_id"`
 	UserName     string `json:"user_name"`
-	TemplateName string `json:"template_name"`
+	TemplateName *string `json:"template_name"`
 	Date         string `json:"date"`
 	SetCount     int    `json:"set_count"`
 }
