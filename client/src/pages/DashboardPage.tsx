@@ -89,21 +89,21 @@ export default function DashboardPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               {templates.map((template) => (
                 <div
                   key={template.id}
-                  className="bg-gray-800 rounded-lg p-4 flex flex-col gap-3"
+                  className="bg-gray-800 rounded-lg p-3 flex flex-col gap-2 h-44"
                 >
                   <div>
-                    <p className="font-bold text-lg">{template.name}</p>
+                    <p className="font-bold">{template.name}</p>
                     {template.day_of_week && (
-                      <p className="text-sm text-gray-400">
+                      <p className="text-xs text-gray-400">
                         {template.day_of_week}
                       </p>
                     )}
                     {template.exercises && template.exercises.length > 0 && (
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 mt-1">
                         {template.exercises
                           .slice(0, 3)
                           .map((e) => e.name)
@@ -115,7 +115,7 @@ export default function DashboardPage() {
                   </div>
                   <button
                     onClick={() => handleStartSession(template.id)}
-                    className="w-full py-2 bg-orange-500 hover:bg-orange-600 rounded font-bold cursor-pointer"
+                    className="mt-auto w-full py-2 bg-orange-500 hover:bg-orange-600 rounded font-bold cursor-pointer"
                   >
                     Start Workout
                   </button>
