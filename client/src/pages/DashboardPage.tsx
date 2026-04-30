@@ -189,12 +189,23 @@ export default function DashboardPage() {
           >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">{selectedTemplate.name}</h2>
-              <button
-                onClick={() => setSelectedTemplate(null)}
-                className="text-gray-400 hover:text-white cursor-pointer"
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-6">
+                <button
+                  onClick={() => {
+                    setSelectedTemplate(null);
+                    navigate(`/templates/${selectedTemplate.id}`);
+                  }}
+                  className="text-gray-400 hover:text-orange-400 text-sm cursor-pointer"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => setSelectedTemplate(null)}
+                  className="text-gray-400 text-xl hover:text-white cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             {selectedTemplate.day_of_week && (
