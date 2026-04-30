@@ -109,11 +109,11 @@ export default function SessionPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-gray-900 text-white p-6">Loading...</div>
+      <div className="h-full bg-gray-900 text-white p-6">Loading...</div>
     );
   if (!session)
     return (
-      <div className="min-h-screen bg-gray-900 text-white p-6">
+      <div className="h-full bg-gray-900 text-white p-6">
         Session not found
       </div>
     );
@@ -134,7 +134,7 @@ export default function SessionPage() {
       : Array.from(exerciseMap.values());
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
+    <div className="h-full overflow-y-auto bg-gray-900 text-white p-4">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
           {isLive ? (

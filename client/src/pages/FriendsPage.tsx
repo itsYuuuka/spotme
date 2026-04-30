@@ -52,7 +52,7 @@ export default function FriendsPage() {
   const pending = friends.filter((f) => f.status === "pending");
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="h-full overflow-y-auto bg-gray-900 text-white p-6">
       <div className="max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Friends</h1>
 

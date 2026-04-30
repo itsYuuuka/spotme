@@ -50,7 +50,7 @@ export default function TemplatesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="h-full overflow-y-auto bg-gray-900 text-white p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Your Templates</h1>

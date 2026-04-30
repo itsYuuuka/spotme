@@ -210,17 +210,17 @@ export default function TemplatePage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-gray-900 text-white p-6">Loading...</div>
+      <div className="h-full bg-gray-900 text-white p-6">Loading...</div>
     );
   if (!template)
     return (
-      <div className="min-h-screen bg-gray-900 text-white p-6">
+      <div className="h-full bg-gray-900 text-white p-6">
         Template not found.
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="h-full overflow-y-auto bg-gray-900 text-white p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
           <Link to="/templates" className="text-gray-400 hover:text-white">
