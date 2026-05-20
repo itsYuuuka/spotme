@@ -26,11 +26,11 @@ A full-stack workout tracking PWA for you and your gym buddy. Log sessions, trac
 Create a database and run the migrations:
 ```bash
 createdb spotme
-psql spotme -f migrations/001_create_users.sql
-psql spotme -f migrations/002_create_workout_templates.sql
-psql spotme -f migrations/003_create_sessions.sql
-psql spotme -f migrations/004_create_friendships.sql
-psql spotme -f migrations/005_create_session_exercises.sql
+psql postgres://user:password@localhost:5432/spotme?sslmode=disable -f migrations/001_create_users.sql
+psql postgres://user:password@localhost:5432/spotme?sslmode=disable -f migrations/002_create_workout_templates.sql
+psql postgres://user:password@localhost:5432/spotme?sslmode=disable -f migrations/003_create_sessions.sql
+psql postgres://user:password@localhost:5432/spotme?sslmode=disable -f migrations/004_create_friendships.sql
+psql postgres://user:password@localhost:5432/spotme?sslmode=disable -f migrations/005_create_session_exercises.sql
 ```
 
 ### Backend
@@ -39,6 +39,7 @@ Create a `.env` file in the root directory:
 DATABASE_URL=postgres://user:password@localhost:5432/spotme?sslmode=disable
 JWT_SECRET=your-secret-key
 PORT=8080
+ALLOWED_ORIGINS=http://localhost:5173
 ```
 ```bash
 go run ./cmd/api
