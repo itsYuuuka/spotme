@@ -659,7 +659,7 @@ export default function SessionPage() {
             <button
               onClick={() => {
                 localStorage.removeItem("liveSessionId");
-                navigate("/dashboard");
+                navigate(`/session/${id}`);
               }}
               className="py-3 px-5 rounded-xl font-extrabold cursor-pointer tracking-tight"
               style={{
