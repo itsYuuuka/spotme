@@ -149,7 +149,8 @@ func (h *Handler) DeleteSet(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetWeek(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r)
-	dates, err := h.svc.GetWeek(r.Context(), userID)
+	tz := r.URL.Query().Get("tz")
+	dates, err := h.svc.GetWeek(r.Context(), userID, tz)
 	if err != nil {
 		respondError(w, http.StatusInternalServerError, "failed to fetch week")
 		return

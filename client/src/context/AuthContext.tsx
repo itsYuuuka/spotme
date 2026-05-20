@@ -14,6 +14,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+function isTokenValid(token: string | null): boolean {
+  if (!token) return false;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("token"),
@@ -53,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         token,
         name,
-        isLoggedIn: !!token,
+        isLoggedIn: isTokenValid(token),
         login,
         register,
         logout,

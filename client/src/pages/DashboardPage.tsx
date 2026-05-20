@@ -52,20 +52,6 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (selectedTemplate) {
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
-    }
-    return () => {
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
-    };
-  }, [selectedTemplate]);
-
   const handleStartSession = async (templateId: string) => {
     try {
       const today = new Date().toISOString().split("T")[0];

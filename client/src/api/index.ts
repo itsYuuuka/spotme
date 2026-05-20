@@ -115,13 +115,17 @@ export const deleteSession = (id: string) => api.delete(`/api/sessions/${id}`);
 export const addExerciseToSession = (sessionId: string, name: string) =>
   api.post<Exercise>(`/api/sessions/${sessionId}/exercises`, { name });
 
-export const getWeek = () => api.get<{ dates: string[] }>("/api/sessions/week");
+export const getWeek = () =>
+  api.get<{ dates: string[] }>(
+    `/api/sessions/week?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`,
+  );
 
 // Sets
 export const addSet = (
   sessionId: string,
   data: {
-    exercise_id: string;
+    exercise_id?: string;
+    session_exercise_id?: string;
     set_number: number;
     reps: number;
     weight: number;

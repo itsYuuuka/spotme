@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -35,7 +36,10 @@ func (s *Service) Register(ctx context.Context, req RegisterRequest) (AuthRespon
 		req.Email, string(hash), req.Name,
 	).Scan(&id)
 	if err != nil {
-		return AuthResponse{}, ErrUserExists
+		if strings.Contains(err.Error(), "unique") {
+			return AuthResponse{}, ErrUserExists
+		}
+		return AuthResponse{}, err
 	}
 	token, err := s.generateToken(id)
 	if err != nil {
@@ -65,7 +69,7 @@ func (s *Service) Login(ctx context.Context, req LoginRequest) (AuthResponse, er
 func (s *Service) generateToken(userID string) (string, error) {
 	claims := jwt.MapClaims{
 		"sub": userID,
-		"exp": time.Now().Add(24 * time.Hour).Unix(),
+		"exp": time.Now().Add(7 * 24 * time.Hour).Unix(),
 		"iat": time.Now().Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
