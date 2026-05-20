@@ -28,11 +28,12 @@ type CreateSessionRequest struct {
 }
 
 type AddSetRequest struct {
-	ExerciseID      string  `json:"exercise_id"`
-	SetNumber       int     `json:"set_number"`
-	Reps            int     `json:"reps"`
-	Weight          float64 `json:"weight"`
-	DurationSeconds int     `json:"duration_seconds"`
+	ExerciseID        string  `json:"exercise_id"`
+	SessionExerciseID string  `json:"session_exercise_id"`
+	SetNumber         int     `json:"set_number"`
+	Reps              int     `json:"reps"`
+	Weight            float64 `json:"weight"`
+	DurationSeconds   int     `json:"duration_seconds"`
 }
 
 type UpdateSetRequest struct {
@@ -54,4 +55,10 @@ type Exercise struct {
 	Notes      string `json:"notes"`
 	IsTimed    bool   `json:"is_timed"`
 	OrderIndex int    `json:"order_index"`
+}
+
+type SessionExercise struct {
+	ID        string `json:"id"`
+	SessionID string `json:"session_id"`
+	Name      string `json:"name"`
 }

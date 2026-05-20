@@ -72,12 +72,16 @@ func (s *Service) GetSession(ctx context.Context, id, userID string) (*Session, 
 	}
 
 	rows, err := s.db.Query(ctx, `
-		SELECT ss.id, ss.session_id, ss.exercise_id, te.name, ss.set_number, ss.reps, ss.weight, ss.duration_seconds
-		FROM session_sets ss
-		JOIN template_exercises te ON te.id = ss.exercise_id
-		WHERE ss.session_id = $1
-		ORDER BY ss.exercise_id, ss.set_number
-	`, id)
+    SELECT ss.id, ss.session_id,
+           COALESCE(ss.exercise_id::text, ss.session_exercise_id::text) as exercise_id,
+           COALESCE(te.name, se.name) as exercise_name,
+           ss.set_number, ss.reps, ss.weight, ss.duration_seconds
+    FROM session_sets ss
+    LEFT JOIN template_exercises te ON te.id = ss.exercise_id
+    LEFT JOIN session_exercises se ON se.id = ss.session_exercise_id
+    WHERE ss.session_id = $1
+    ORDER BY COALESCE(te.order_index, se.order_index), ss.set_number
+`, id)
 	if err != nil {
 		return nil, err
 	}
@@ -120,15 +124,28 @@ func (s *Service) DeleteSession(ctx context.Context, id, userID string) error {
 
 func (s *Service) AddSet(ctx context.Context, sessionID, userID string, req AddSetRequest) (*SessionSet, error) {
 	var set SessionSet
-	err := s.db.QueryRow(ctx, `
-		INSERT INTO session_sets (session_id, exercise_id, set_number, reps, weight, duration_seconds)
-		SELECT $1, $2, $3, $4, $5, $6
-		FROM sessions
-		WHERE id = $1 AND user_id = $7
-		RETURNING id, session_id, exercise_id, set_number, reps, weight, duration_seconds		
-	`, sessionID, req.ExerciseID, req.SetNumber, req.Reps, req.Weight, req.DurationSeconds, userID).Scan(&set.ID, &set.SessionID, &set.ExerciseID, &set.SetNumber, &set.Reps, &set.Weight, &set.DurationSeconds)
-	if err != nil {
-		return nil, ErrNotFound
+	if req.SessionExerciseID != "" {
+		err := s.db.QueryRow(ctx, `
+            INSERT INTO session_sets (session_id, session_exercise_id, set_number, reps, weight, duration_seconds)
+            SELECT $1, $2, $3, $4, $5, $6
+            FROM sessions WHERE id = $1 AND user_id = $7
+            RETURNING id, session_id, session_exercise_id as exercise_id, set_number, reps, weight, duration_seconds
+        `, sessionID, req.SessionExerciseID, req.SetNumber, req.Reps, req.Weight, req.DurationSeconds, userID,
+		).Scan(&set.ID, &set.SessionID, &set.ExerciseID, &set.SetNumber, &set.Reps, &set.Weight, &set.DurationSeconds)
+		if err != nil {
+			return nil, ErrNotFound
+		}
+	} else {
+		err := s.db.QueryRow(ctx, `
+            INSERT INTO session_sets (session_id, exercise_id, set_number, reps, weight, duration_seconds)
+            SELECT $1, $2, $3, $4, $5, $6
+            FROM sessions WHERE id = $1 AND user_id = $7
+            RETURNING id, session_id, exercise_id, set_number, reps, weight, duration_seconds
+        `, sessionID, req.ExerciseID, req.SetNumber, req.Reps, req.Weight, req.DurationSeconds, userID,
+		).Scan(&set.ID, &set.SessionID, &set.ExerciseID, &set.SetNumber, &set.Reps, &set.Weight, &set.DurationSeconds)
+		if err != nil {
+			return nil, ErrNotFound
+		}
 	}
 	return &set, nil
 }
@@ -164,8 +181,11 @@ func (s *Service) DeleteSet(ctx context.Context, setID, userID string) error {
 	return nil
 }
 
-func (s *Service) GetWeek(ctx context.Context, userID string) ([]string, error) {
-	loc, _ := time.LoadLocation("Europe/Vienna")
+func (s *Service) GetWeek(ctx context.Context, userID string, tz string) ([]string, error) {
+	loc, err := time.LoadLocation(tz)
+	if err != nil || tz == "" {
+		loc = time.UTC
+	}
 	now := time.Now().In(loc)
 	weekday := int(now.Weekday())
 	if weekday == 0 {
@@ -199,28 +219,28 @@ func (s *Service) GetWeek(ctx context.Context, userID string) ([]string, error) 
 	return dates, rows.Err()
 }
 
-func (s *Service) AddExerciseToSession(ctx context.Context, sessionID, userID string, req AddExerciseRequest) (*Exercise, error) {
-	var templateID string
+func (s *Service) AddExerciseToSession(ctx context.Context, sessionID, userID string, req AddExerciseRequest) (*SessionExercise, error) {
+	var exists bool
 	err := s.db.QueryRow(ctx,
-		`SELECT template_id FROM sessions WHERE id = $1 AND user_id = $2`,
+		`SELECT EXISTS(SELECT 1 FROM sessions WHERE id = $1 AND user_id = $2)`,
 		sessionID, userID,
-	).Scan(&templateID)
-	if err != nil {
+	).Scan(&exists)
+	if err != nil || !exists {
 		return nil, ErrNotFound
 	}
 
 	var count int
 	s.db.QueryRow(ctx,
-		`SELECT COUNT(*) FROM template_exercises WHERE template_id = $1`,
-		templateID,
+		`SELECT COUNT(*) FROM session_exercises WHERE session_id = $1`,
+		sessionID,
 	).Scan(&count)
 
-	var ex Exercise
+	var ex SessionExercise
 	err = s.db.QueryRow(ctx, `
-        INSERT INTO template_exercises (template_id, name, target_sets, target_reps, notes, is_timed, order_index, is_extra)
-        VALUES ($1, $2, 0, 0, '', false, $3, true)
-        RETURNING id, template_id, name, target_sets, target_reps, notes, is_timed, order_index
-    `, templateID, req.Name, count).Scan(&ex.ID, &ex.TemplateID, &ex.Name, &ex.TargetSets, &ex.TargetReps, &ex.Notes, &ex.IsTimed, &ex.OrderIndex)
+        INSERT INTO session_exercises (session_id, name, order_index)
+        VALUES ($1, $2, $3)
+        RETURNING id, session_id, name
+    `, sessionID, req.Name, count).Scan(&ex.ID, &ex.SessionID, &ex.Name)
 	if err != nil {
 		return nil, err
 	}

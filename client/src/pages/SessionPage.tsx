@@ -100,8 +100,11 @@ export default function SessionPage() {
     const input = inputs[exerciseId] ?? { reps: "8", weight: "0" };
     const existingSets = getExerciseSets(exerciseId);
     try {
+      const isSessionExercise = extraExercises.some((e) => e.id === exerciseId);
       const res = await addSet(id, {
-        exercise_id: exerciseId,
+        ...(isSessionExercise
+          ? { session_exercise_id: exerciseId }
+          : { exercise_id: exerciseId }),
         set_number: existingSets.length + 1,
         reps: parseInt(input.reps.replace(",", ".")) || 0,
         weight: parseFloat(input.weight.replace(",", ".")) || 0,
