@@ -54,7 +54,7 @@ export default function DashboardPage() {
 
   const handleStartSession = async (templateId: string) => {
     try {
-      const today = new Date().toISOString().split("T")[0];
+      const today = new Date().toLocaleDateString("en-CA");
       const res = await createSession({
         template_id: templateId,
         date: today,
