@@ -18,7 +18,7 @@ A full-stack workout tracking PWA for you and your gym buddy. Log sessions, trac
 ## Getting Started
 
 ### Prerequisites
-- Go 1.21+
+- Go 1.25+
 - PostgreSQL 16+
 - Node.js 18+
 
@@ -30,6 +30,7 @@ psql spotme -f migrations/001_create_users.sql
 psql spotme -f migrations/002_create_workout_templates.sql
 psql spotme -f migrations/003_create_sessions.sql
 psql spotme -f migrations/004_create_friendships.sql
+psql spotme -f migrations/005_create_session_exercises.sql
 ```
 
 ### Backend
