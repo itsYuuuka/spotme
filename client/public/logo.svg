@@ -1,0 +1,19 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="112" fill="none"></rect>
+
+  <!-- Barbell -->
+  <g fill="#ffffff">
+    <rect x="116" y="236" width="280" height="40" rx="20"></rect>
+    <rect x="72" y="204" width="36" height="104" rx="18"></rect>
+    <rect x="108" y="184" width="44" height="144" rx="22"></rect>
+    <rect x="360" y="184" width="44" height="144" rx="22"></rect>
+    <rect x="404" y="204" width="36" height="104" rx="18"></rect>
+
+    <!-- Friends / spotters -->
+    <circle cx="198" cy="176" r="34"></circle>
+    <circle cx="314" cy="176" r="34"></circle>
+
+    <!-- Progress check / shared lift hint -->
+    <path d="M179 252c-10-10-10-26 0-36s26-10 36 0l41 41 41-41c10-10 26-10 36 0s10 26 0 36l-58 58c-10 10-26 10-36 0l-60-58z"></path>
+  </g>
+</svg>
