@@ -32,7 +32,7 @@ func (s *Service) GetExerciseProgress(ctx context.Context, exerciseID, userID st
 	}
 
 	rows, err := s.db.Query(ctx, `
-              SELECT date::text, max_weight, best_reps, sets FROM (
+              SELECT date::text, COALESCE(max_weight, 0), COALESCE(best_reps, 0), sets FROM (
                       SELECT
                               s.date,
                               MAX(ss.weight) AS max_weight,
@@ -86,7 +86,7 @@ func (s *Service) GetAllProgress(ctx context.Context, userID string) ([]Exercise
                       exercise_id,
                       exercise_name,
                       date::text,
-                      max_weight
+                      COALESCE(max_weight, 0)
               FROM (
                       SELECT ss.exercise_id AS exercise_id, te.name AS exercise_name, s.date, MAX(ss.weight) OVER (PARTITION BY ss.exercise_id, s.date) AS max_weight
                       FROM session_sets ss

@@ -112,12 +112,8 @@ func (h *Handler) AddExercise(w http.ResponseWriter, r *http.Request) {
 		respondError(w, http.StatusBadRequest, "exercise name must be between 1 and 50 characters")
 		return
 	}
-	if req.TargetSets < 1 || req.TargetSets > 100 {
-		respondError(w, http.StatusBadRequest, "target sets must be between 1 and 100")
-		return
-	}
-	if req.TargetReps < 1 || req.TargetReps > 1000 {
-		respondError(w, http.StatusBadRequest, "target reps must be between 1 and 1000")
+	if msg := validateExerciseTargets(req.TargetSets, req.TargetReps, req.IsTimed); msg != "" {
+		respondError(w, http.StatusBadRequest, msg)
 		return
 	}
 	exercise, err := h.svc.AddExercise(r.Context(), templateID, userID, req)
@@ -144,12 +140,8 @@ func (h *Handler) UpdateExercise(w http.ResponseWriter, r *http.Request) {
 		respondError(w, http.StatusBadRequest, "exercise name must be between 1 and 50 characters")
 		return
 	}
-	if req.TargetSets < 1 || req.TargetSets > 100 {
-		respondError(w, http.StatusBadRequest, "target sets must be between 1 and 100")
-		return
-	}
-	if req.TargetReps < 1 || req.TargetReps > 1000 {
-		respondError(w, http.StatusBadRequest, "target reps must be between 1 and 1000")
+	if msg := validateExerciseTargets(req.TargetSets, req.TargetReps, req.IsTimed); msg != "" {
+		respondError(w, http.StatusBadRequest, msg)
 		return
 	}
 	exercise, err := h.svc.UpdateExercise(r.Context(), exerciseID, userID, req)
@@ -177,6 +169,26 @@ func (h *Handler) DeleteExercise(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// validateExerciseTargets returns an error message, or "" if the targets are
+// valid. Timed exercises are measured in duration rather than reps, so they may
+// target 0 reps.
+func validateExerciseTargets(sets, reps int, isTimed bool) string {
+	if sets < 1 || sets > 100 {
+		return "target sets must be between 1 and 100"
+	}
+	minReps := 1
+	if isTimed {
+		minReps = 0
+	}
+	if reps < minReps || reps > 1000 {
+		if isTimed {
+			return "target reps must be between 0 and 1000"
+		}
+		return "target reps must be between 1 and 1000"
+	}
+	return ""
 }
 
 func respondJSON(w http.ResponseWriter, status int, data any) {
