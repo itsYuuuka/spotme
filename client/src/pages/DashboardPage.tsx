@@ -122,7 +122,7 @@ export default function DashboardPage() {
 
   return (
     <div
-      className="text-white h-full flex flex-col"
+      className="text-white h-full overflow-y-auto"
       style={{
         background: "#0B0810",
         backgroundImage: `
@@ -131,7 +131,7 @@ export default function DashboardPage() {
   `,
       }}
     >
-      <div className="max-w-4xl mx-auto w-full flex-1 overflow-y-auto px-4 pt-4 pb-4">
+      <div className="max-w-4xl mx-auto w-full px-4 pt-4 pb-4">
         {/* Hero card */}
         <div
           className="rounded-2xl p-4 mb-4 overflow-hidden relative"
