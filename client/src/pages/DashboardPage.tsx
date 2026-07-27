@@ -10,7 +10,7 @@ import {
   getWeek,
 } from "../api";
 import type { Template, FeedItem, Friendship } from "../types";
-import { formatDate } from "../utils";
+import { formatDate, toLocalDateStr } from "../utils";
 
 export default function DashboardPage() {
   const { name } = useAuth();
@@ -54,7 +54,7 @@ export default function DashboardPage() {
 
   const handleStartSession = async (templateId: string) => {
     try {
-      const today = new Date().toLocaleDateString("en-CA");
+      const today = toLocalDateStr(new Date());
       const res = await createSession({
         template_id: templateId,
         date: today,
@@ -78,7 +78,7 @@ export default function DashboardPage() {
       "Saturday",
     ];
     const today = new Date();
-    const todayStr = today.toISOString().split("T")[0];
+    const todayStr = toLocalDateStr(today);
     const trainedToday = weekDates.includes(todayStr);
     const todayIdx = today.getDay();
 
@@ -111,6 +111,12 @@ export default function DashboardPage() {
     if (bi === -1) return -1;
     return ai - bi;
   });
+
+  const scheduledDays = new Set(
+    templates
+      .map((t) => t.day_of_week?.toLowerCase())
+      .filter((d): d is string => Boolean(d)),
+  );
 
   const upNext = getUpNext();
 
@@ -191,9 +197,12 @@ export default function DashboardPage() {
               const diff = i - mondayBased;
               const slotDate = new Date(now);
               slotDate.setDate(now.getDate() + diff);
-              const slotStr = slotDate.toISOString().split("T")[0];
+              const slotStr = toLocalDateStr(slotDate);
 
               const isDone = weekDates.includes(slotStr);
+              const isScheduled = scheduledDays.has(dayOrder[i].toLowerCase());
+              const isMissed = isScheduled && !isDone && !isToday && !isFuture;
+              const isUpcoming = isScheduled && !isDone && isFuture;
 
               return (
                 <div
@@ -216,13 +225,18 @@ export default function DashboardPage() {
                       borderRadius: 5,
                       background: isDone
                         ? "#E8E1D3"
-                        : isToday && !isDone
+                        : isToday
                           ? "transparent"
-                          : isFuture
-                            ? "rgba(255,255,255,0.1)"
-                            : "rgba(255,255,255,0.1)",
-                      border:
-                        isToday && !isDone ? "1.5px solid #E8E1D3" : "none",
+                          : isUpcoming
+                            ? "color-mix(in oklab, #E8E1D3 30%, transparent)"
+                            : isMissed
+                              ? "transparent"
+                              : "rgba(255,255,255,0.1)",
+                      border: isToday
+                        ? "1.5px solid #E8E1D3"
+                        : isMissed
+                          ? "1.5px solid rgba(255,255,255,0.28)"
+                          : "none",
                     }}
                   />
                 </div>
